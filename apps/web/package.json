@@ -1,0 +1,31 @@
+{
+  "name": "@zapadictos/web",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "build": "nuxt build",
+    "dev": "nuxt dev",
+    "preview": "nuxt preview",
+    "lint": "oxlint app server shared test",
+    "typecheck": "nuxt typecheck",
+    "test": "vitest run",
+    "postinstall": "nuxt prepare"
+  },
+  "dependencies": {
+    "@tailwindcss/vite": "4.3.3",
+    "@zapadictos/shared": "workspace:*",
+    "nuxt": "^4.6.3",
+    "tailwindcss": "4.3.3",
+    "vue": "^3.5.44",
+    "vue-router": "^5.4.0"
+  },
+  "devDependencies": {
+    "@nuxt/test-utils": "^4.3.4",
+    "@vue/test-utils": "^2.5.1",
+    "happy-dom": "^21.0.4",
+    "oxlint": "^1.58.0",
+    "typescript": "^6.0.2",
+    "vitest": "^4.1.2",
+    "vue-tsc": "^3.3.14"
+  }
+}

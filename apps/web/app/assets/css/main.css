@@ -1,0 +1,96 @@
+@import 'tailwindcss';
+
+/*
+ * Tokens del sistema visual (docs/07-pantallas.md).
+ * Regla: los componentes usan estos tokens, nunca colores sueltos.
+ */
+@theme {
+  --color-bg: #f3f1ec;
+  --color-surface: #ffffff;
+  --color-muted: #e8e3dc;
+  --color-ink: #111111;
+  --color-ink-soft: #6b6760;
+  --color-line: #ddd8d0;
+  --color-line-soft: #e4dfd7;
+  --color-accent: #ff5a1f;
+
+  --color-success-bg: #ddf1e2;
+  --color-success: #1e6b3a;
+  --color-danger-bg: #fbe0dc;
+  --color-danger: #a1221b;
+  --color-warning-bg: #ffe3d6;
+  --color-warning: #8a2e0a;
+  --color-info-bg: #e1e9f7;
+  --color-info: #1f4a8a;
+  --color-neutral-bg: #e6e1d9;
+  --color-neutral: #4a463f;
+  --color-placeholder: #8c877f;
+  --color-sidebar-active: #2a2a2a;
+  --color-sidebar-line: #2e2e2e;
+  --color-sidebar-soft: #a8a29a;
+
+  --font-sans: 'DM Sans', system-ui, sans-serif;
+  --font-display: 'Archivo', 'DM Sans', sans-serif;
+
+  --radius-card: 20px;
+}
+
+@layer base {
+  html {
+    background-color: var(--color-bg);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-ink);
+    outline-offset: 2px;
+  }
+
+  dialog::backdrop {
+    background: rgb(17 17 17 / 0.45);
+  }
+}
+
+@utility font-display-wide {
+  font-family: var(--font-display);
+  font-stretch: 125%;
+  font-weight: 900;
+  text-transform: uppercase;
+  line-height: 0.95;
+}
+
+@utility container-page {
+  width: 100%;
+  max-width: 1250px;
+  margin-inline: auto;
+  padding-inline: 24px;
+}
+
+/* Campos de formulario del sistema visual. */
+@utility input-base {
+  height: 46px;
+  width: 100%;
+  border: 1px solid var(--color-line);
+  border-radius: 12px;
+  background: var(--color-surface);
+  padding-inline: 14px;
+  font-size: 16px;
+  color: var(--color-ink);
+
+  &[aria-invalid='true'] {
+    border-color: var(--color-danger);
+  }
+
+  &:disabled {
+    background: var(--color-bg);
+    color: var(--color-ink-soft);
+  }
+}
+
+@utility card {
+  border: 1px solid var(--color-line-soft);
+  border-radius: var(--radius-card);
+  background: var(--color-surface);
+}

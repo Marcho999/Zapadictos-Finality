@@ -1,0 +1,354 @@
+// Modelo de datos de Zapadictos. Fuente: docs/03-modelo-datos.md
+// Convenciones: ids UUID, montos en pesos enteros (Int), fechas en UTC.
+
+generator client {
+  provider            = "prisma-client"
+  output              = "../src/generated/prisma"
+  moduleFormat        = "esm"
+  importFileExtension = "js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Gender {
+  MEN
+  WOMEN
+  UNISEX
+}
+
+enum OrderStatus {
+  PENDING_PAYMENT
+  PAID
+  SHIPPED
+  DELIVERED
+  CANCELLED
+}
+
+enum PaymentStatus {
+  PENDING
+  APPROVED
+  DECLINED
+  VOIDED
+  ERROR
+}
+
+enum ActorType {
+  ADMIN
+  CUSTOMER
+  SYSTEM
+  ANONYMOUS
+}
+
+// ───────────────────────── Cuentas y sesiones ─────────────────────────
+
+model Customer {
+  id                   String            @id @default(uuid()) @db.Uuid
+  name                 String            @db.VarChar(80)
+  email                String            @unique @db.VarChar(254)
+  passwordHash         String
+  phone                String?           @db.VarChar(10)
+  dataPolicyAcceptedAt DateTime
+  active               Boolean           @default(true)
+  createdAt            DateTime          @default(now())
+  updatedAt            DateTime          @updatedAt
+  sessions             CustomerSession[]
+  addresses            Address[]
+  cartItems            CartItem[]
+  orders               Order[]
+  auditLogs            AuditLog[]
+}
+
+model Admin {
+  id                 String         @id @default(uuid()) @db.Uuid
+  name               String         @db.VarChar(80)
+  email              String         @unique @db.VarChar(254)
+  passwordHash       String
+  mustChangePassword Boolean        @default(false)
+  active             Boolean        @default(true)
+  failedLoginCount   Int            @default(0)
+  lockedUntil        DateTime?
+  lastLoginAt        DateTime?
+  createdById        String?        @db.Uuid
+  createdBy          Admin?         @relation("AdminCreatedBy", fields: [createdById], references: [id], onDelete: Restrict)
+  createdAdmins      Admin[]        @relation("AdminCreatedBy")
+  createdAt          DateTime       @default(now())
+  updatedAt          DateTime       @updatedAt
+  sessions           AdminSession[]
+  offers             Offer[]
+  bannerEdits        Banner[]
+  auditLogs          AuditLog[]
+}
+
+model CustomerSession {
+  id         String    @id @default(uuid()) @db.Uuid
+  customerId String    @db.Uuid
+  customer   Customer  @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  tokenHash  String    @unique @db.Char(64)
+  family     String    @db.Uuid
+  expiresAt  DateTime
+  revokedAt  DateTime?
+  userAgent  String?   @db.VarChar(300)
+  ip         String?   @db.VarChar(45)
+  createdAt  DateTime  @default(now())
+
+  @@index([customerId])
+  @@index([family])
+}
+
+model AdminSession {
+  id        String    @id @default(uuid()) @db.Uuid
+  adminId   String    @db.Uuid
+  admin     Admin     @relation(fields: [adminId], references: [id], onDelete: Cascade)
+  tokenHash String    @unique @db.Char(64)
+  family    String    @db.Uuid
+  expiresAt DateTime
+  revokedAt DateTime?
+  userAgent String?   @db.VarChar(300)
+  ip        String?   @db.VarChar(45)
+  createdAt DateTime  @default(now())
+
+  @@index([adminId])
+  @@index([family])
+}
+
+// ───────────────────────────── Catálogo ─────────────────────────────
+
+model Brand {
+  id        String    @id @default(uuid()) @db.Uuid
+  name      String    @unique @db.VarChar(60)
+  slug      String    @unique @db.VarChar(80)
+  active    Boolean   @default(true)
+  createdAt DateTime  @default(now())
+  products  Product[]
+}
+
+model Category {
+  id        String    @id @default(uuid()) @db.Uuid
+  name      String    @unique @db.VarChar(60)
+  slug      String    @unique @db.VarChar(80)
+  active    Boolean   @default(true)
+  sortOrder Int       @default(0)
+  createdAt DateTime  @default(now())
+  products  Product[]
+}
+
+model Product {
+  id          String         @id @default(uuid()) @db.Uuid
+  reference   String         @unique @db.VarChar(20)
+  name        String         @db.VarChar(80)
+  slug        String         @unique @db.VarChar(80)
+  description String         @db.VarChar(2000)
+  gender      Gender
+  /// Precio normal en COP con IVA incluido. CHECK (price > 0) en la migración.
+  price       Int
+  active      Boolean        @default(true)
+  brandId     String         @db.Uuid
+  brand       Brand          @relation(fields: [brandId], references: [id], onDelete: Restrict)
+  categoryId  String         @db.Uuid
+  category    Category       @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+  colors      ProductColor[]
+  offers      Offer[]
+
+  @@index([active, createdAt])
+  @@index([brandId])
+  @@index([categoryId])
+}
+
+model ProductColor {
+  id        String         @id @default(uuid()) @db.Uuid
+  productId String         @db.Uuid
+  product   Product        @relation(fields: [productId], references: [id], onDelete: Restrict)
+  name      String         @db.VarChar(30)
+  hex       String         @db.Char(7)
+  code      String         @db.VarChar(5)
+  sortOrder Int            @default(0)
+  active    Boolean        @default(true)
+  images    ProductImage[]
+  variants  Variant[]
+
+  @@unique([productId, code])
+}
+
+model ProductImage {
+  id             String       @id @default(uuid()) @db.Uuid
+  productColorId String       @db.Uuid
+  productColor   ProductColor @relation(fields: [productColorId], references: [id], onDelete: Cascade)
+  url            String       @db.VarChar(500)
+  publicId       String       @db.VarChar(200)
+  alt            String       @db.VarChar(150)
+  sortOrder      Int          @default(0)
+
+  @@index([productColorId, sortOrder])
+}
+
+model Variant {
+  id             String       @id @default(uuid()) @db.Uuid
+  productColorId String       @db.Uuid
+  productColor   ProductColor @relation(fields: [productColorId], references: [id], onDelete: Restrict)
+  /// Talla EU entera, de 34 a 48 (CHECK en la migración).
+  size           Int
+  sku            String       @unique @db.VarChar(30)
+  /// CHECK (stock >= 0) en la migración: nunca se vende de más.
+  stock          Int          @default(0)
+  active         Boolean      @default(true)
+  cartItems      CartItem[]
+  orderItems     OrderItem[]
+
+  @@unique([productColorId, size])
+}
+
+model Offer {
+  id          String   @id @default(uuid()) @db.Uuid
+  productId   String   @db.Uuid
+  product     Product  @relation(fields: [productId], references: [id], onDelete: Restrict)
+  /// CHECK ("salePrice" > 0); que sea menor que Product.price lo valida la API.
+  salePrice   Int
+  startsAt    DateTime
+  /// CHECK ("endsAt" > "startsAt") en la migración.
+  endsAt      DateTime
+  active      Boolean  @default(true)
+  createdById String   @db.Uuid
+  createdBy   Admin    @relation(fields: [createdById], references: [id], onDelete: Restrict)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([productId, active, startsAt, endsAt])
+}
+
+/// Registro único con el contenido de la portada.
+model Banner {
+  id            String   @id @default(uuid()) @db.Uuid
+  tag           String   @db.VarChar(24)
+  title         String   @db.VarChar(60)
+  subtitle      String   @db.VarChar(200)
+  imageUrl      String?  @db.VarChar(500)
+  imagePublicId String?  @db.VarChar(200)
+  ctaLabel      String   @db.VarChar(30)
+  /// Solo rutas internas que empiezan por "/" (lo valida la API).
+  ctaHref       String   @db.VarChar(120)
+  updatedAt     DateTime @updatedAt
+  updatedById   String?  @db.Uuid
+  updatedBy     Admin?   @relation(fields: [updatedById], references: [id], onDelete: SetNull)
+}
+
+// ────────────────────────────── Compra ──────────────────────────────
+
+model Address {
+  id            String   @id @default(uuid()) @db.Uuid
+  customerId    String   @db.Uuid
+  customer      Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  label         String   @db.VarChar(40)
+  recipientName String   @db.VarChar(80)
+  phone         String   @db.VarChar(10)
+  department    String   @db.VarChar(40)
+  city          String   @db.VarChar(60)
+  line1         String   @db.VarChar(120)
+  notes         String?  @db.VarChar(120)
+  isDefault     Boolean  @default(false)
+  createdAt     DateTime @default(now())
+
+  @@index([customerId])
+}
+
+model CartItem {
+  id         String   @id @default(uuid()) @db.Uuid
+  customerId String   @db.Uuid
+  customer   Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  variantId  String   @db.Uuid
+  variant    Variant  @relation(fields: [variantId], references: [id], onDelete: Cascade)
+  /// De 1 a 5 (CHECK en la migración).
+  quantity   Int
+  createdAt  DateTime @default(now())
+
+  @@unique([customerId, variantId])
+}
+
+model Order {
+  id                String      @id @default(uuid()) @db.Uuid
+  /// Se muestra como ZP-000123.
+  number            Int         @unique @default(autoincrement())
+  customerId        String      @db.Uuid
+  customer          Customer    @relation(fields: [customerId], references: [id], onDelete: Restrict)
+  status            OrderStatus @default(PENDING_PAYMENT)
+  subtotal          Int
+  shippingCost      Int
+  total             Int
+  shipRecipientName String      @db.VarChar(80)
+  shipPhone         String      @db.VarChar(10)
+  shipDepartment    String      @db.VarChar(40)
+  shipCity          String      @db.VarChar(60)
+  shipLine1         String      @db.VarChar(120)
+  shipNotes         String?     @db.VarChar(120)
+  expiresAt         DateTime
+  paidAt            DateTime?
+  shippedAt         DateTime?
+  deliveredAt       DateTime?
+  cancelledAt       DateTime?
+  cancelReason      String?     @db.VarChar(200)
+  needsReview       Boolean     @default(false)
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
+  items             OrderItem[]
+  payments          Payment[]
+
+  @@index([customerId, createdAt])
+  @@index([status, expiresAt])
+}
+
+model OrderItem {
+  id          String  @id @default(uuid()) @db.Uuid
+  orderId     String  @db.Uuid
+  order       Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  variantId   String  @db.Uuid
+  variant     Variant @relation(fields: [variantId], references: [id], onDelete: Restrict)
+  quantity    Int
+  unitPrice   Int
+  listPrice   Int
+  productName String  @db.VarChar(80)
+  colorName   String  @db.VarChar(30)
+  size        Int
+  sku         String  @db.VarChar(30)
+
+  @@index([orderId])
+}
+
+model Payment {
+  id                 String        @id @default(uuid()) @db.Uuid
+  orderId            String        @db.Uuid
+  order              Order         @relation(fields: [orderId], references: [id], onDelete: Restrict)
+  reference          String        @unique @db.VarChar(40)
+  wompiTransactionId String?       @unique @db.VarChar(64)
+  status             PaymentStatus @default(PENDING)
+  amountInCents      Int
+  method             String?       @db.VarChar(30)
+  rawEvent           Json?
+  createdAt          DateTime      @default(now())
+  updatedAt          DateTime      @updatedAt
+
+  @@index([orderId])
+}
+
+// ──────────────────────────── Auditoría ────────────────────────────
+
+model AuditLog {
+  id         String    @id @default(uuid()) @db.Uuid
+  actorType  ActorType
+  adminId    String?   @db.Uuid
+  admin      Admin?    @relation(fields: [adminId], references: [id], onDelete: Restrict)
+  customerId String?   @db.Uuid
+  customer   Customer? @relation(fields: [customerId], references: [id], onDelete: SetNull)
+  action     String    @db.VarChar(60)
+  entity     String?   @db.VarChar(40)
+  entityId   String?   @db.VarChar(64)
+  /// Valores antes/después. Nunca contraseñas, tokens ni datos de tarjeta.
+  details    Json?
+  ip         String?   @db.VarChar(45)
+  createdAt  DateTime  @default(now())
+
+  @@index([createdAt])
+  @@index([action, createdAt])
+}

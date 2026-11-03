@@ -1,0 +1,21 @@
+node_modules/
+dist/
+.output/
+.nuxt/
+.nitro/
+.cache/
+.data/
+coverage/
+*.log
+.DS_Store
+
+# Secretos: solo se versiona .env.example
+.env
+.env.*
+!.env.example
+
+# Cliente de Prisma generado
+apps/api/src/generated/
+
+# Fotos subidas en desarrollo (en producción van a Cloudinary)
+apps/api/uploads/
