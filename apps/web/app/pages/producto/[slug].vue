@@ -52,7 +52,22 @@ const modelName = computed(() => {
   return name.toLowerCase().startsWith(prefix.toLowerCase()) ? name.slice(prefix.length) : name;
 });
 
-const cartNotice = ref(false);
+const cart = useCart();
+const cartNotice = ref<{ tone: 'success' | 'danger'; text: string } | null>(null);
+const addingToCart = ref(false);
+async function addToCart() {
+  if (!variant.value) return;
+  cartNotice.value = null;
+  addingToCart.value = true;
+  try {
+    await cart.add(variant.value.id);
+    cartNotice.value = { tone: 'success', text: `Agregamos talla ${variant.value.size} en ${color.value?.name} a tu carrito.` };
+  } catch (error) {
+    cartNotice.value = { tone: 'danger', text: apiErrorBody(error).message ?? 'No pudimos agregarlo al carrito.' };
+  } finally {
+    addingToCart.value = false;
+  }
+}
 const sizeGuide = ref<{ open: () => void }>();
 
 function formatEndDate(iso: string) {
@@ -175,11 +190,16 @@ useSeoMeta({
         </fieldset>
 
         <div class="flex flex-col gap-3">
-          <UiButton block :disabled="!variant" @click="cartNotice = true">
-            {{ variant ? 'Agregar al carrito' : 'Elige una talla' }}
+          <UiButton block :disabled="!variant || addingToCart" @click="addToCart">
+            {{ variant ? (addingToCart ? 'Agregando…' : 'Agregar al carrito') : 'Elige una talla' }}
           </UiButton>
-          <p v-if="cartNotice" role="status" class="rounded-xl bg-info-bg px-4 py-3 text-sm text-info">
-            El carrito se habilita en la Fase 4 del proyecto. Elegiste talla {{ variant?.size }} en {{ color.name }}.
+          <p
+            v-if="cartNotice"
+            :role="cartNotice.tone === 'danger' ? 'alert' : 'status'"
+            class="rounded-xl px-4 py-3 text-sm font-medium"
+            :class="cartNotice.tone === 'danger' ? 'bg-danger-bg text-danger' : 'bg-success-bg text-success'"
+          >
+            {{ cartNotice.text }}
           </p>
         </div>
 

@@ -4,12 +4,29 @@ import tailwindcss from '@tailwindcss/vite';
 const clientOnly = { ssr: false } as const;
 
 // Encabezados de seguridad para todas las páginas (docs/06-seguridad.md A05).
-// La CSP completa (con el widget de Wompi) llega en la Fase 4.
 const securityHeaders = {
   'X-Content-Type-Options': 'nosniff',
   'Referrer-Policy': 'strict-origin-when-cross-origin',
   'X-Frame-Options': 'DENY',
   'Permissions-Policy': 'camera=(), microphone=(), geolocation=()',
+  // Permite el widget de Wompi (D-10), Cloudinary y Google Fonts; el resto
+  // queda en 'self'. 'unsafe-inline' en script-src es necesario porque Nuxt
+  // inyecta el payload de hidratación (window.__NUXT__) como script inline y
+  // el proyecto no usa un módulo con nonces (nuxt-security); connect-src
+  // admite ws:/wss: para no romper el HMR de Vite en desarrollo. Las llamadas
+  // que el widget hace a los servidores de Wompi ocurren dentro de su propio
+  // iframe, con el CSP de Wompi, así que connect-src no necesita ese dominio.
+  'Content-Security-Policy': [
+    "default-src 'self'",
+    "base-uri 'none'",
+    "frame-ancestors 'none'",
+    "script-src 'self' 'unsafe-inline' https://checkout.wompi.co",
+    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+    "font-src 'self' https://fonts.gstatic.com",
+    "img-src 'self' data: https://res.cloudinary.com",
+    "connect-src 'self' ws: wss:",
+    "frame-src https://checkout.wompi.co",
+  ].join('; '),
 };
 
 export default defineNuxtConfig({

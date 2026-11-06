@@ -3,6 +3,7 @@ const route = useRoute();
 const links = [
   { label: 'Perfil', to: '/cuenta', hash: '' },
   { label: 'Direcciones', to: '/cuenta', hash: '#direcciones' },
+  { label: 'Mis pedidos', to: '/cuenta/pedidos', hash: '' },
 ];
 </script>
 
@@ -17,9 +18,6 @@ const links = [
     >
       {{ link.label }}
     </NuxtLink>
-    <span class="flex items-center justify-between rounded-xl px-4 py-3 font-medium text-ink-soft" title="Disponible en la Fase 4">
-      Mis pedidos <span class="text-xs">Fase 4</span>
-    </span>
     <button type="button" class="block w-full rounded-xl px-4 py-3 text-left font-medium text-ink-soft hover:bg-bg" @click="customerLogout">
       Cerrar sesión
     </button>

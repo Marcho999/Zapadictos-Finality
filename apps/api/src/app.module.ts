@@ -6,7 +6,9 @@ import { HttpExceptionFilter } from './common/filters/http-exception.filter.js';
 import { OriginGuard } from './common/security/origin.guard.js';
 import { AdminAuthModule } from './modules/admin-auth/admin-auth.module.js';
 import { AdminCatalogModule } from './modules/admin-catalog/admin-catalog.module.js';
+import { AdminCustomersModule } from './modules/admin-customers/admin-customers.module.js';
 import { AdminOrdersModule } from './modules/admin-orders/admin-orders.module.js';
+import { AdminSummaryModule } from './modules/admin-summary/admin-summary.module.js';
 import { CartModule } from './modules/cart/cart.module.js';
 import { OrdersModule } from './modules/orders/orders.module.js';
 import { PaymentsModule } from './modules/payments/payments.module.js';
@@ -37,6 +39,8 @@ import { loadEnv } from './config/env.js';
     AdminAuthModule,
     AdminCatalogModule,
     AdminOrdersModule,
+    AdminCustomersModule,
+    AdminSummaryModule,
   ],
   controllers: [HealthController],
   providers: [

@@ -8,11 +8,11 @@ watch(() => route.fullPath, () => (menuOpen.value = false));
 
 // Las secciones que aún no existen se muestran deshabilitadas con su fase.
 const items: { label: string; to: string; icon: IconName; exact?: boolean; soon?: string }[] = [
-  { label: 'Resumen', to: '/admin', icon: 'grid', exact: true, soon: 'Fase 5' },
+  { label: 'Resumen', to: '/admin', icon: 'grid', exact: true },
   { label: 'Productos', to: '/admin/productos', icon: 'box' },
-  { label: 'Pedidos', to: '/admin/pedidos', icon: 'bag', soon: 'Fase 4' },
+  { label: 'Pedidos', to: '/admin/pedidos', icon: 'bag' },
   { label: 'Catálogo', to: '/admin/catalogo', icon: 'tag' },
-  { label: 'Clientes', to: '/admin/clientes', icon: 'users', soon: 'Fase 5' },
+  { label: 'Clientes', to: '/admin/clientes', icon: 'users' },
   { label: 'Portada', to: '/admin/portada', icon: 'image', soon: 'Fase 5' },
   { label: 'Administradores', to: '/admin/administradores', icon: 'shield', soon: 'Fase 5' },
 ];

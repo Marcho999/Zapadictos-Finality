@@ -1,4 +1,6 @@
-import { GENDERS, SIZE_MAX, SIZE_MIN } from './constants.js';
+import { GENDERS, SIZE_MAX, SIZE_MIN, type OrderStatus } from './constants.js';
+import type { AddressDto } from './account.js';
+import type { OrderSummaryDto } from './orders.js';
 import { z } from './zod-es.js';
 
 /** Esquemas del panel de administración (docs/04-api.md, docs/05-reglas-negocio.md). */
@@ -287,4 +289,47 @@ export interface AdminBrandDto {
 
 export interface AdminCategoryDto extends AdminBrandDto {
   sortOrder: number;
+}
+
+// ───────────────────────────── Clientes ─────────────────────────────
+
+export const adminCustomerListQuerySchema = z
+  .object({
+    q: z.string().trim().min(1).max(80).optional(),
+    page: z.coerce.number().int().min(1).max(1000).default(1),
+  })
+  .strict();
+export type AdminCustomerListQuery = z.infer<typeof adminCustomerListQuerySchema>;
+
+export interface AdminCustomerRowDto {
+  id: string;
+  name: string;
+  email: string;
+  phone: string | null;
+  active: boolean;
+  createdAt: string;
+  ordersCount: number;
+}
+
+export interface AdminCustomerDetailDto {
+  id: string;
+  name: string;
+  email: string;
+  phone: string | null;
+  active: boolean;
+  dataPolicyAcceptedAt: string;
+  createdAt: string;
+  addresses: AddressDto[];
+  orders: OrderSummaryDto[];
+}
+
+// ───────────────────────────── Resumen ─────────────────────────────
+
+export interface AdminSummaryDto {
+  salesToday: number;
+  salesMonth: number;
+  ordersByStatus: Record<OrderStatus, number>;
+  lowStockProducts: number;
+  activeOffers: number;
+  ordersNeedingReview: number;
 }

@@ -8,7 +8,7 @@ Los controles están agrupados según las categorías del OWASP Top 10. Cada uno
 - [x] El registro rechaza campos de más (`role`, `active`…), así que nadie puede crearse una cuenta con privilegios. *Prueba: "no permite registrarse como administrador".*
 - [ ] Guard global que deniega por defecto: toda ruta necesita sesión salvo las marcadas con `@Public()`.
 - [x] Las direcciones siempre se filtran por el `customerId` de la sesión: si son de otro cliente, la API responde 404. *Prueba: "un cliente no puede ver, editar ni borrar las direcciones de otro".*
-- [ ] Lo mismo para el carrito y los pedidos (Fase 4).
+- [x] Lo mismo para el carrito y los pedidos. *Pruebas: "el carrito de un cliente no se puede tocar con la sesión de otro" y "un cliente no puede ver ni pagar el pedido de otro (404)" en `orders.e2e-spec.ts`.*
 - [x] Mientras un administrador tenga `mustChangePassword`, solo puede usar `me`, `change-password` y `logout`. *Prueba: "con contraseña temporal solo puede cambiarla".*
 - [x] El guard del panel revisa en la base, en cada petición, que la sesión siga abierta y que el administrador siga activo. *Prueba: "un administrador desactivado pierde el acceso".*
 - [x] (Panel) Las páginas de `/admin` tienen el middleware `admin`, que redirige a `/admin/ingresar`. Es solo para mejorar la experiencia: la protección real está en la API. El parámetro `volver` solo acepta rutas internas de `/admin`, para evitar redirecciones abiertas.
@@ -26,15 +26,15 @@ Los controles están agrupados según las categorías del OWASP Top 10. Cada uno
 - [ ] `Banner.ctaHref` solo acepta rutas internas que empiecen por `/`, para impedir enlaces `javascript:` o a sitios externos.
 
 ## A04 · Diseño inseguro
-- [ ] Precio, total y stock se calculan en la API; nunca se aceptan del frontend.
-- [ ] El stock se descuenta en una transacción con una actualización condicionada, para no vender dos veces la misma talla. *Prueba: dos pedidos simultáneos por la última unidad; solo uno debe completarse.*
-- [ ] El webhook de Wompi verifica el checksum, el monto y la moneda antes de marcar un pedido como pagado, y es idempotente.
-- [ ] Límite de 3 pedidos pendientes por cliente y vencimiento a los 30 minutos.
+- [x] Precio, total y stock se calculan en la API; nunca se aceptan del frontend. *Prueba: "ignora cualquier precio que mande el navegador" en `orders.e2e-spec.ts`.*
+- [x] El stock se descuenta en una transacción con una actualización condicionada, para no vender dos veces la misma talla. *Prueba: "dos pedidos simultáneos por el último par: solo uno se completa" en `orders.e2e-spec.ts`.*
+- [x] El webhook de Wompi verifica el checksum, el monto y la moneda antes de marcar un pedido como pagado, y es idempotente. *Pruebas: "el webhook sin firma válida se rechaza..." y "un webhook APPROVED firmado marca el pedido como pagado, y repetirlo no cambia nada" en `orders.e2e-spec.ts`.*
+- [x] Límite de 3 pedidos pendientes por cliente y vencimiento a los 30 minutos. *Pruebas: "no acepta direcciones de otro cliente ni carritos vacíos, y limita a 3 pedidos pendientes" y "cancela los pedidos vencidos y devuelve el stock" en `orders.e2e-spec.ts`.*
 
 ## A05 · Configuración incorrecta
 - [x] `helmet` activado en la API, con la CSP `default-src 'none'`. *Prueba: "envía encabezados de seguridad" en `catalog.e2e-spec.ts`.*
 - [x] Nuxt envía `X-Content-Type-Options`, `X-Frame-Options: DENY`, `Referrer-Policy` y `Permissions-Policy` en todas las páginas.
-- [ ] CSP en Nuxt que solo permita el script del widget de Wompi, las imágenes de Cloudinary y Google Fonts (Fase 4).
+- [x] CSP en Nuxt que solo permite el script e iframe del widget de Wompi, las imágenes de Cloudinary y Google Fonts (`apps/web/nuxt.config.ts`). *`script-src` usa `'unsafe-inline'` porque Nuxt inyecta el payload de hidratación como script inline y el proyecto no usa un módulo con nonces (`nuxt-security`); queda como limitación conocida. Prueba: revisión manual de los encabezados y de la consola en `/checkout` (sin prueba automática todavía).*
 - [x] Como el navegador solo habla con Nuxt, CORS en la API no permite ningún origen de navegador; el proxy solo reenvía `/api/v1/**`.
 - [x] Las peticiones que modifican datos verifican el encabezado `Origin` (`OriginGuard` global), como defensa adicional contra CSRF. *Prueba: "exigen el Origin de la web".*
 - [x] Cookies: `httpOnly`, `Secure` y `SameSite=Strict`. La cookie de acceso del admin lleva `Path=/api/v1/admin`, y su refresh `Path=/api/v1/admin/auth`. *Prueba: "el login deja cookies…".*
@@ -63,12 +63,12 @@ Los controles están agrupados según las categorías del OWASP Top 10. Cada uno
 ## A09 · Fallas de registro y monitoreo
 - [x] (Panel) `AuditLog` registra los logins (correctos, fallidos y bloqueados), la reutilización de refresh tokens, el cambio de contraseña y todos los cambios del catálogo, con los valores anteriores y nuevos. *Prueba: "cada cambio del panel queda en la auditoría".*
 - [x] Clientes: registro, logins fallidos y reutilización de refresh tokens.
-- [ ] Pedidos y pagos (Fase 4).
+- [x] Pedidos y pagos: creación, cancelación, cada cambio de estado de pago y los eventos con firma inválida quedan en `AuditLog` (`ORDER_CREATED`, `ORDER_CANCELLED`, `PAYMENT_*`, `ORDER_REVIVED`, `ORDER_NEEDS_REVIEW`, `PAYMENT_EVENT_REJECTED` en `orders.service.ts` y `payments.service.ts`).
 - [x] Los registros nunca incluyen contraseñas, tokens, cookies ni datos de tarjeta: `redact()` las omite por nombre de campo. *Pruebas: `audit.service.spec.ts` y "sin guardar la contraseña".*
 
 ## A10 · SSRF
 - [x] (Cloudinary) La API solo hace peticiones salientes a `api.cloudinary.com`, con un tiempo límite de 20 segundos. Nunca a URLs que lleguen del usuario.
-- [ ] Lo mismo para la API de Wompi (Fase 4).
+- [x] Lo mismo para la API de Wompi: `fetchTransaction` en `payments.service.ts` usa una URL fija de configuración (`WOMPI_API_URL`) y un id de transacción codificado, nunca una URL que mande el cliente. *Prueba: "verify consulta a Wompi de servidor a servidor y solo acepta transacciones del mismo pedido" en `orders.e2e-spec.ts`.*
 
 ## Datos personales (Ley 1581 de 2012)
 - [x] Casilla obligatoria para aceptar la política de tratamiento de datos al registrarse, con un enlace a `/privacidad`. Se guarda la fecha de aceptación y se muestra en Mi cuenta. *Prueba: "exige aceptar la política de datos".*

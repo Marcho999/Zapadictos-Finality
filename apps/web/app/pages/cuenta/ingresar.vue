@@ -19,6 +19,7 @@ const login = useZodForm(customerLoginSchema, { email: '', password: '' });
 async function submitLogin() {
   await login.submit(async (data) => {
     setCustomer(await $fetch<CustomerMeDto>('/api/v1/auth/login', { method: 'POST', body: data }));
+    await useCart().merge();
     await navigateTo(nextPath());
   });
 }
@@ -33,6 +34,7 @@ const register = useZodForm(customerRegisterSchema, {
 async function submitRegister() {
   await register.submit(async (data) => {
     setCustomer(await $fetch<CustomerMeDto>('/api/v1/auth/register', { method: 'POST', body: data }));
+    await useCart().merge();
     await navigateTo(nextPath());
   });
 }

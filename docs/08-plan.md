@@ -8,8 +8,8 @@ Son 12 semanas, del **martes 2026-11-03 al martes 2027-01-26**. *La fecha de ent
 | 1 · Base técnica ✅ (adelantada el 3 nov) | 2–3 | 10 – 23 nov | Monorepo, PostgreSQL en Docker, esquema Prisma con las 18 entidades, seed, CI, sistema visual en Tailwind y componentes base, proxy de Nuxt. **Hito:** `GET /products` funcionando y la página Tienda consumiéndolo |
 | 2 · Catálogo ✅ (adelantada el 3 nov) | 4–5 | 24 nov – 7 dic | Inicio, Tienda con filtros, Detalle con colores y tallas, y en el admin: login de admin, Productos, Editar producto (con colores, tallas, fotos y ofertas) y Marcas y categorías |
 | 3 · Cuentas ✅ (adelantada el 3 nov) | 6–7 | 8 – 21 dic | Registro y login de clientes, cookies seguras, refresh con rotación, Mi cuenta y direcciones, y límites de intentos |
-| 4 · Compra | 8–9 | 22 dic – 4 ene | Carrito (local y en la base de datos, con la unión al iniciar sesión), pedidos con reserva de stock, tarea de vencimiento, Wompi sandbox (widget, webhook y verificación), Pedido y Mis pedidos, y el admin de Pedidos |
-| 5 · Admin extra y cierre | 10–12 | 5 – 26 ene | Semana 10: Resumen, Clientes, Administradores y Portada. Semanas 11 y 12: completar el checklist de seguridad, pruebas, despliegue en Vercel, Render y Neon, y el documento final |
+| 4 · Compra ✅ (adelantada el 6 nov) | 8–9 | 22 dic – 4 ene | Carrito (local y en la base de datos, con la unión al iniciar sesión), pedidos con reserva de stock, tarea de vencimiento, Wompi sandbox (widget, webhook y verificación), Pedido y Mis pedidos, y el admin de Pedidos |
+| 5 · Admin extra y cierre (en curso: Resumen y Clientes listos el 6 nov; faltan Administradores y Portada) | 10–12 | 5 – 26 ene | Semana 10: Resumen, Clientes, Administradores y Portada. Semanas 11 y 12: completar el checklist de seguridad, pruebas, despliegue en Vercel, Render y Neon, y el documento final |
 
 **Riesgo:** la Fase 4 cae en Navidad y Año Nuevo. Si esas semanas rinden menos, se usa la semana 10 para terminar la compra y se recortan las funciones de admin según su prioridad:
 

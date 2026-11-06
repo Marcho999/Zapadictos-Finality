@@ -30,5 +30,13 @@ export const LOW_STOCK_TOTAL = 5;
 /** Unidades máximas de una misma variante en el carrito. */
 export const MAX_QTY_PER_ITEM = 5;
 
+/**
+ * Tarifa de envío (D-13), igual al valor por defecto de la variable de
+ * entorno `SHIPPING_COST` de la API. Solo se usa para la vista previa del
+ * carrito del visitante antes de iniciar sesión: el total real siempre lo
+ * calcula la API (`GET /cart`, `POST /orders`).
+ */
+export const SHIPPING_COST = 15000;
+
 /** Minutos que el stock queda reservado mientras se paga. */
 export const ORDER_RESERVATION_MINUTES = 30;

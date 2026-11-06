@@ -1,8 +1,12 @@
 <script setup lang="ts">
 const route = useRoute();
 const customer = useCustomer();
-// La sesión se consulta en el navegador, nunca en el SSR (D-03).
-onMounted(() => loadCustomer());
+const cart = useCart();
+// La sesión y el carrito se consultan en el navegador, nunca en el SSR (D-03).
+onMounted(() => {
+  loadCustomer();
+  cart.load();
+});
 const search = ref(typeof route.query.q === 'string' ? route.query.q : '');
 const menuOpen = ref(false);
 
@@ -62,10 +66,9 @@ function submitSearch() {
         </form>
         <NuxtLink v-if="customer" to="/cuenta" class="hidden font-semibold sm:inline">Hola, {{ firstName(customer.name) }}</NuxtLink>
         <NuxtLink v-else to="/cuenta/ingresar" class="hidden font-semibold underline underline-offset-4 sm:inline">Ingresar</NuxtLink>
-        <!-- El carrito llega en la Fase 4. -->
         <UiButton to="/carrito" size="sm">
           <UiIcon name="bag" :size="16" />
-          <span>Carrito (0)</span>
+          <span>Carrito ({{ cart.itemCount.value }})</span>
         </UiButton>
         <button
           type="button"
