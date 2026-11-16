@@ -1,0 +1,48 @@
+# Blueprint de Render para la API (docs/09-despliegue.md).
+# Los valores con "sync: false" no se guardan aquí: Render pide escribirlos
+# a mano en el panel la primera vez que se usa este blueprint.
+services:
+  - type: web
+    name: zapadictos-api
+    runtime: node
+    region: ohio
+    plan: free
+    buildCommand: >-
+      corepack enable &&
+      corepack prepare pnpm@12.16.1 --activate &&
+      pnpm install --frozen-lockfile &&
+      pnpm --filter @zapadictos/shared build &&
+      pnpm --filter @zapadictos/api build
+    # Corre después del build, antes de poner en línea la nueva versión.
+    preDeployCommand: pnpm --filter @zapadictos/api db:deploy
+    startCommand: node apps/api/dist/main.js
+    healthCheckPath: /api/v1/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: TRUST_PROXY_HOPS
+        value: "2"
+      - key: SHIPPING_COST
+        value: "15000"
+      - key: WOMPI_API_URL
+        value: https://sandbox.wompi.co/v1
+      - key: DATABASE_URL
+        sync: false
+      - key: WEB_ORIGIN
+        sync: false
+      - key: SEED_ADMIN_EMAIL
+        sync: false
+      - key: SEED_ADMIN_PASSWORD
+        sync: false
+      - key: ADMIN_JWT_SECRET
+        sync: false
+      - key: CUSTOMER_JWT_SECRET
+        sync: false
+      - key: CLOUDINARY_URL
+        sync: false
+      - key: WOMPI_PUBLIC_KEY
+        sync: false
+      - key: WOMPI_INTEGRITY_SECRET
+        sync: false
+      - key: WOMPI_EVENTS_SECRET
+        sync: false

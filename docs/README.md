@@ -14,6 +14,7 @@ Esta carpeta es la **fuente de verdad** del proyecto. Reemplaza y amplía la "Gu
 | [06-seguridad.md](06-seguridad.md) | Checklist de seguridad según OWASP Top 10 |
 | [07-pantallas.md](07-pantallas.md) | Las 18 pantallas, el sistema visual y el comportamiento en móvil |
 | [08-plan.md](08-plan.md) | Fases, fechas y qué recortar si falta tiempo |
+| [09-despliegue.md](09-despliegue.md) | Guía paso a paso para desplegar en Vercel, Render y Neon |
 | [decisiones.md](decisiones.md) | Registro de decisiones y su porqué |
 
 Mockups: los 5 originales están en el PDF "Zapadictos — Mockups". Los nuevos (16 lienzos, que cubren las 13 pantallas faltantes y los cambios por las ofertas) están en el lienzo [Zapadictos — Mockups (pantallas nuevas)](https://claude.ai/artifact/7PFy9BCjtGG6pZ23VrvFnN), con dos páginas: Tienda y Panel admin.
