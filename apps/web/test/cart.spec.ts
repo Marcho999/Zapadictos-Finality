@@ -53,7 +53,9 @@ describe('useCart (carrito de visitante)', () => {
   const cleanups: (() => void)[] = [];
 
   beforeEach(() => {
-    localStorage.clear();
+    // `window.localStorage`, no el global: Node 26 expone su propio
+    // `localStorage` experimental que tapa el de happy-dom.
+    window.localStorage.clear();
     setCustomer(null);
   });
 
@@ -82,7 +84,7 @@ describe('useCart (carrito de visitante)', () => {
 
     const cart = await mountCart();
     await cart.add('v1', 1);
-    localStorage.setItem('zp_cart', JSON.stringify([{ variantId: 'v1', quantity: 3 }]));
+    window.localStorage.setItem('zp_cart', JSON.stringify([{ variantId: 'v1', quantity: 3 }]));
     await cart.load();
 
     const line = cart.cart.value!.lines[0];
@@ -101,7 +103,7 @@ describe('useCart (carrito de visitante)', () => {
   });
 
   it('une el carrito local al iniciar sesión y vacía el localStorage', async () => {
-    localStorage.setItem('zp_cart', JSON.stringify([{ variantId: 'v1', quantity: 2 }]));
+    window.localStorage.setItem('zp_cart', JSON.stringify([{ variantId: 'v1', quantity: 2 }]));
     const merged = { lines: [], count: 2, subtotal: 779800, shippingCost: 15000, total: 794800, canCheckout: true };
     cleanups.push(
       registerEndpoint('/api/v1/cart/merge', {
@@ -118,6 +120,6 @@ describe('useCart (carrito de visitante)', () => {
     await cart.merge();
 
     expect(cart.cart.value).toEqual(merged);
-    expect(localStorage.getItem('zp_cart')).toBeNull();
+    expect(window.localStorage.getItem('zp_cart')).toBeNull();
   });
 });

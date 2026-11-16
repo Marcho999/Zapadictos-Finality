@@ -291,6 +291,44 @@ export interface AdminCategoryDto extends AdminBrandDto {
   sortOrder: number;
 }
 
+// ───────────────────────────── Administradores ─────────────────────────────
+
+export const adminCreateSchema = z
+  .object({
+    name: z.string().trim().min(2, 'Escribe el nombre').max(80),
+    email,
+    temporaryPassword: z
+      .string()
+      .min(ADMIN_PASSWORD_MIN, `Debe tener al menos ${ADMIN_PASSWORD_MIN} caracteres`)
+      .max(200),
+  })
+  .strict();
+export type AdminCreateInput = z.infer<typeof adminCreateSchema>;
+
+export const adminUpdateSchema = z
+  .object({
+    active: z.boolean(),
+    temporaryPassword: z
+      .string()
+      .min(ADMIN_PASSWORD_MIN, `Debe tener al menos ${ADMIN_PASSWORD_MIN} caracteres`)
+      .max(200),
+  })
+  .partial()
+  .strict()
+  .refine((v) => Object.keys(v).length > 0, 'No hay cambios para guardar');
+export type AdminUpdateInput = z.infer<typeof adminUpdateSchema>;
+
+export interface AdminAccountDto {
+  id: string;
+  name: string;
+  email: string;
+  active: boolean;
+  mustChangePassword: boolean;
+  lastLoginAt: string | null;
+  createdAt: string;
+  createdByName: string | null;
+}
+
 // ───────────────────────────── Clientes ─────────────────────────────
 
 export const adminCustomerListQuerySchema = z

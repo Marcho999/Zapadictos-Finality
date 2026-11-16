@@ -62,6 +62,7 @@ Los controles están agrupados según las categorías del OWASP Top 10. Cada uno
 
 ## A09 · Fallas de registro y monitoreo
 - [x] (Panel) `AuditLog` registra los logins (correctos, fallidos y bloqueados), la reutilización de refresh tokens, el cambio de contraseña y todos los cambios del catálogo, con los valores anteriores y nuevos. *Prueba: "cada cambio del panel queda en la auditoría".*
+- [x] Administradores: creación, activación/desactivación y restablecimiento de contraseña quedan en `AuditLog` (`ADMIN_CREATED`, `ADMIN_DEACTIVATED`, `ADMIN_REACTIVATED`, `ADMIN_PASSWORD_RESET` en `admin-admins.service.ts`), nunca con la contraseña en texto plano (`redact()`).
 - [x] Clientes: registro, logins fallidos y reutilización de refresh tokens.
 - [x] Pedidos y pagos: creación, cancelación, cada cambio de estado de pago y los eventos con firma inválida quedan en `AuditLog` (`ORDER_CREATED`, `ORDER_CANCELLED`, `PAYMENT_*`, `ORDER_REVIVED`, `ORDER_NEEDS_REVIEW`, `PAYMENT_EVENT_REJECTED` en `orders.service.ts` y `payments.service.ts`).
 - [x] Los registros nunca incluyen contraseñas, tokens, cookies ni datos de tarjeta: `redact()` las omite por nombre de campo. *Pruebas: `audit.service.spec.ts` y "sin guardar la contraseña".*

@@ -5,6 +5,7 @@ import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter.js';
 import { OriginGuard } from './common/security/origin.guard.js';
 import { AdminAuthModule } from './modules/admin-auth/admin-auth.module.js';
+import { AdminAdminsModule } from './modules/admin-admins/admin-admins.module.js';
 import { AdminCatalogModule } from './modules/admin-catalog/admin-catalog.module.js';
 import { AdminCustomersModule } from './modules/admin-customers/admin-customers.module.js';
 import { AdminOrdersModule } from './modules/admin-orders/admin-orders.module.js';
@@ -38,6 +39,7 @@ import { loadEnv } from './config/env.js';
     PaymentsModule,
     AdminAuthModule,
     AdminCatalogModule,
+    AdminAdminsModule,
     AdminOrdersModule,
     AdminCustomersModule,
     AdminSummaryModule,

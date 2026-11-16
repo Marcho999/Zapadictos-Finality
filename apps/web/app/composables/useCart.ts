@@ -10,7 +10,7 @@ interface LocalItem {
 function readLocal(): LocalItem[] {
   if (!import.meta.client) return [];
   try {
-    const raw = localStorage.getItem(LOCAL_KEY);
+    const raw = window.localStorage.getItem(LOCAL_KEY);
     const parsed = raw ? JSON.parse(raw) : [];
     return Array.isArray(parsed)
       ? parsed.filter((i): i is LocalItem => typeof i?.variantId === 'string' && Number.isInteger(i?.quantity))
@@ -23,8 +23,8 @@ function readLocal(): LocalItem[] {
 function writeLocal(items: LocalItem[]) {
   if (!import.meta.client) return;
   try {
-    if (items.length) localStorage.setItem(LOCAL_KEY, JSON.stringify(items));
-    else localStorage.removeItem(LOCAL_KEY);
+    if (items.length) window.localStorage.setItem(LOCAL_KEY, JSON.stringify(items));
+    else window.localStorage.removeItem(LOCAL_KEY);
   } catch {
     // El almacenamiento puede estar lleno o bloqueado; el carrito sigue en memoria.
   }
