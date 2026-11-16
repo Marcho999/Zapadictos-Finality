@@ -234,6 +234,33 @@ const products: ProductSeed[] = [
   },
 ];
 
+/**
+ * Ilustraciones genéricas por color (apps/web/public/placeholders/), para que
+ * el catálogo no se vea vacío mientras el administrador sube fotos reales.
+ */
+const PLACEHOLDER_SLUG_BY_COLOR: Record<string, string> = {
+  Negro: 'negro',
+  Blanco: 'blanco',
+  Naranja: 'naranja',
+  Gris: 'gris',
+  Verde: 'verde',
+  Rosa: 'rosa',
+  Beige: 'beige',
+  Azul: 'azul',
+  Lila: 'lila',
+  Crudo: 'crudo',
+};
+
+function placeholderImage(colorName: string) {
+  const slug = PLACEHOLDER_SLUG_BY_COLOR[colorName] ?? 'negro';
+  return {
+    url: `/placeholders/shoe-${slug}.svg`,
+    publicId: `seed:shoe-${slug}`,
+    alt: `Ilustración genérica de la zapatilla en ${colorName.toLowerCase()}`,
+    sortOrder: 0,
+  };
+}
+
 function slugify(text: string) {
   return text
     .normalize('NFD')
@@ -307,6 +334,7 @@ async function seedCatalog(prisma: PrismaClient, adminId: string) {
             hex: color.hex,
             code: color.code,
             sortOrder: index,
+            images: { create: [placeholderImage(color.name)] },
             variants: {
               create: Object.entries(color.stock).map(([size, stock]) => ({
                 size: Number(size),
@@ -352,6 +380,8 @@ async function seedBanner(prisma: PrismaClient) {
         'Filtra por marca, talla y precio, paga seguro y recibe tus zapatillas en cualquier ciudad de Colombia.',
       ctaLabel: 'Ver catálogo',
       ctaHref: '/tienda',
+      imageUrl: '/placeholders/banner-hero.svg',
+      imagePublicId: 'seed:banner-hero',
     },
   });
   console.log('✓ Portada');
