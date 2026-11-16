@@ -23,7 +23,7 @@ Los controles están agrupados según las categorías del OWASP Top 10. Cada uno
 - [x] Validación con esquemas Zod `.strict()` (D-21): un campo no declarado se rechaza, igual que `whitelist` + `forbidNonWhitelisted`, y los datos se transforman a su tipo. *Prueba: `catalog.e2e-spec.ts` ("rechaza parámetros desconocidos") y `catalog.spec.ts` en shared.*
 - [x] El acceso a datos es solo por Prisma. Si alguna vez hace falta SQL, solo con `$queryRaw` y plantillas parametrizadas, nunca con `$queryRawUnsafe`. El catálogo usa `$queryRaw` con `Prisma.sql`, y la búsqueda escapa `%` y `_`. *Prueba: "trata % como texto" en `catalog.e2e-spec.ts`.* La única excepción es el `TRUNCATE` de la preparación de las pruebas, que toma los nombres de las tablas del catálogo de PostgreSQL y solo corre sobre una base `*_test`.
 - [x] Las descripciones se muestran como texto plano: el proyecto no usa `v-html` en ninguna parte.
-- [ ] `Banner.ctaHref` solo acepta rutas internas que empiecen por `/`, para impedir enlaces `javascript:` o a sitios externos.
+- [x] `Banner.ctaHref` solo acepta una de una lista fija de páginas internas (`BANNER_CTA_OPTIONS` en `packages/shared/src/admin.ts`, validado con `z.enum` en `adminBannerUpdateSchema`), para impedir enlaces `javascript:` o a sitios externos. *Prueba: "un ctaHref fuera de la lista fija responde 400" en `admin-banner.e2e-spec.ts`.*
 
 ## A04 · Diseño inseguro
 - [x] Precio, total y stock se calculan en la API; nunca se aceptan del frontend. *Prueba: "ignora cualquier precio que mande el navegador" en `orders.e2e-spec.ts`.*

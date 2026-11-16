@@ -13,7 +13,7 @@ const items: { label: string; to: string; icon: IconName; exact?: boolean; soon?
   { label: 'Pedidos', to: '/admin/pedidos', icon: 'bag' },
   { label: 'Catálogo', to: '/admin/catalogo', icon: 'tag' },
   { label: 'Clientes', to: '/admin/clientes', icon: 'users' },
-  { label: 'Portada', to: '/admin/portada', icon: 'image', soon: 'Fase 5' },
+  { label: 'Portada', to: '/admin/portada', icon: 'image' },
   { label: 'Administradores', to: '/admin/administradores', icon: 'shield' },
 ];
 

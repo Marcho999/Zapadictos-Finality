@@ -84,7 +84,7 @@ export function createSessionClient<Me>(config: SessionConfig) {
     post: <T>(path: string, body?: unknown) => call<T>(path, { method: 'POST', body: body as object }),
     patch: <T>(path: string, body: unknown) => call<T>(path, { method: 'PATCH', body: body as object }),
     del: <T>(path: string) => call<T>(path, { method: 'DELETE' }),
-    upload: <T>(path: string, form: FormData) => call<T>(path, { method: 'POST', body: form }),
+    upload: <T>(path: string, form: FormData, method: 'POST' | 'PUT' = 'POST') => call<T>(path, { method, body: form }),
   };
 
   return { api, useMe, load, logout, setMe };

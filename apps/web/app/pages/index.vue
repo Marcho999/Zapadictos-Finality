@@ -1,14 +1,5 @@
 <script setup lang="ts">
-import type { BrandDto, CategoryDto } from '@zapadictos/shared';
-
-interface BannerDto {
-  tag: string;
-  title: string;
-  subtitle: string;
-  imageUrl: string | null;
-  ctaLabel: string;
-  ctaHref: string;
-}
+import type { BannerDto, BrandDto, CategoryDto } from '@zapadictos/shared';
 
 useSeoMeta({
   title: 'Zapatillas en Colombia',

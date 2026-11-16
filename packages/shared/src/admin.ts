@@ -1,5 +1,6 @@
 import { GENDERS, SIZE_MAX, SIZE_MIN, type OrderStatus } from './constants.js';
 import type { AddressDto } from './account.js';
+import type { BannerDto } from './catalog.js';
 import type { OrderSummaryDto } from './orders.js';
 import { z } from './zod-es.js';
 
@@ -359,6 +360,33 @@ export interface AdminCustomerDetailDto {
   createdAt: string;
   addresses: AddressDto[];
   orders: OrderSummaryDto[];
+}
+
+// ───────────────────────────── Portada ─────────────────────────────
+
+/** El botón principal de la portada solo puede apuntar a una de estas páginas (docs/05-reglas-negocio.md). */
+export const BANNER_CTA_OPTIONS = [
+  { value: '/tienda', label: 'Tienda' },
+  { value: '/tienda?gender=MEN', label: 'Hombre' },
+  { value: '/tienda?gender=WOMEN', label: 'Mujer' },
+  { value: '/tienda?onSale=true', label: 'Ofertas' },
+] as const;
+const bannerCtaHrefs = BANNER_CTA_OPTIONS.map((o) => o.value) as [string, ...string[]];
+
+export const adminBannerUpdateSchema = z
+  .object({
+    tag: z.string().trim().min(1, 'Escribe la etiqueta').max(24),
+    title: z.string().trim().min(1, 'Escribe el título').max(60),
+    subtitle: z.string().trim().min(1, 'Escribe el subtítulo').max(200),
+    ctaLabel: z.string().trim().min(1, 'Escribe el texto del botón').max(30),
+    ctaHref: z.enum(bannerCtaHrefs, { error: 'Elige una página de la lista' }),
+  })
+  .strict();
+export type AdminBannerUpdateInput = z.infer<typeof adminBannerUpdateSchema>;
+
+export interface AdminBannerDto extends BannerDto {
+  updatedAt: string;
+  updatedByName: string | null;
 }
 
 // ───────────────────────────── Resumen ─────────────────────────────

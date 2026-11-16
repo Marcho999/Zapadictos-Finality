@@ -119,6 +119,15 @@ export interface ProductDetailDto
   colors: ProductColorDto[];
 }
 
+export interface BannerDto {
+  tag: string;
+  title: string;
+  subtitle: string;
+  imageUrl: string | null;
+  ctaLabel: string;
+  ctaHref: string;
+}
+
 export interface PageMeta {
   page: number;
   pageSize: number;
