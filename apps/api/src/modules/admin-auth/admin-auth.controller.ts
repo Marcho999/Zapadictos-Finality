@@ -16,6 +16,7 @@ import {
   type AdminLoginInput,
 } from '@zapadictos/shared';
 import type { Request, Response } from 'express';
+import { Public } from '../../common/security/route-protection.guard.js';
 import { ZodValidationPipe } from '../../common/pipes/zod-validation.pipe.js';
 import {
   ADMIN_REFRESH_COOKIE,
@@ -44,6 +45,7 @@ export class AdminAuthController {
   constructor(private readonly auth: AdminAuthService) {}
 
   /** 3 intentos por minuto por IP (docs/06-seguridad.md A07). */
+  @Public()
   @Post('login')
   @HttpCode(200)
   @Throttle({ default: { limit: 3, ttl: 60_000 } })
@@ -57,6 +59,7 @@ export class AdminAuthController {
     return result.admin;
   }
 
+  @Public()
   @Post('refresh')
   @HttpCode(200)
   @Throttle({ default: { limit: 30, ttl: 60_000 } })
@@ -72,6 +75,7 @@ export class AdminAuthController {
   }
 
   /** Funciona aunque el token de acceso ya venció: usa el refresh token. */
+  @Public()
   @Post('logout')
   @HttpCode(204)
   async logout(@Req() req: Request, @Res({ passthrough: true }) res: Response) {

@@ -2,6 +2,7 @@ import { Body, Controller, HttpCode, Post, Req, Res } from '@nestjs/common';
 import { Throttle } from '@nestjs/throttler';
 import { customerLoginSchema, customerRegisterSchema, type z } from '@zapadictos/shared';
 import type { Request, Response } from 'express';
+import { Public } from '../../common/security/route-protection.guard.js';
 import { ZodValidationPipe } from '../../common/pipes/zod-validation.pipe.js';
 import { requestMeta } from '../admin-auth/admin-auth.controller.js';
 import { CUSTOMER_REFRESH_COOKIE, clearCustomerCookies, setCustomerCookies } from './customer-cookies.js';
@@ -13,6 +14,7 @@ function refreshCookie(req: Request): string | undefined {
 }
 
 /** Sesión de la tienda (docs/04-api.md). */
+@Public()
 @Controller('auth')
 export class CustomerAuthController {
   constructor(private readonly auth: CustomerAuthService) {}

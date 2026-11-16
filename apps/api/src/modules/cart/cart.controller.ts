@@ -1,10 +1,12 @@
 import { Body, Controller, Delete, Get, Header, Param, ParseUUIDPipe, Patch, Post, Query, UseGuards } from '@nestjs/common';
 import { cartAddSchema, cartMergeSchema, cartUpdateSchema, variantIdsQuerySchema, type z } from '@zapadictos/shared';
+import { Public } from '../../common/security/route-protection.guard.js';
 import { ZodValidationPipe } from '../../common/pipes/zod-validation.pipe.js';
 import { CurrentCustomer, CustomerAuthGuard, type AuthenticatedCustomer } from '../customer-auth/customer-auth.guard.js';
 import { CartService } from './cart.service.js';
 
 /** Datos públicos para pintar el carrito local del visitante. */
+@Public()
 @Controller('variants')
 export class VariantsController {
   constructor(private readonly cart: CartService) {}

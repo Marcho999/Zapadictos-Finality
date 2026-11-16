@@ -1,11 +1,13 @@
 import { Controller, Get, NotFoundException, Param, Res } from '@nestjs/common';
 import type { Response } from 'express';
 import { join } from 'node:path';
+import { Public } from '../../common/security/route-protection.guard.js';
 import { ImageStorage, LOCAL_FILE, LocalImageStorage } from './image-storage.js';
 
 const MIME = { jpg: 'image/jpeg', png: 'image/png', webp: 'image/webp' } as const;
 
 /** Sirve las imágenes guardadas en disco (solo en desarrollo y pruebas). */
+@Public()
 @Controller('uploads')
 export class UploadsController {
   constructor(private readonly storage: ImageStorage) {}

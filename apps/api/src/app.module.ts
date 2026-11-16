@@ -4,6 +4,7 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter.js';
 import { OriginGuard } from './common/security/origin.guard.js';
+import { RouteProtectionGuard } from './common/security/route-protection.guard.js';
 import { AdminAuthModule } from './modules/admin-auth/admin-auth.module.js';
 import { AdminAdminsModule } from './modules/admin-admins/admin-admins.module.js';
 import { AdminBannerModule } from './modules/admin-banner/admin-banner.module.js';
@@ -51,6 +52,7 @@ import { loadEnv } from './config/env.js';
     { provide: APP_FILTER, useClass: HttpExceptionFilter },
     { provide: APP_GUARD, useClass: ThrottlerGuard },
     { provide: APP_GUARD, useClass: OriginGuard },
+    { provide: APP_GUARD, useClass: RouteProtectionGuard },
   ],
 })
 export class AppModule {}

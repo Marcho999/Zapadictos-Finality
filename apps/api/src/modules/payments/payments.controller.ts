@@ -4,6 +4,7 @@ import { paymentVerifySchema, z } from '@zapadictos/shared';
 import type { Request } from 'express';
 import { ZodValidationPipe } from '../../common/pipes/zod-validation.pipe.js';
 import { SkipOriginCheck } from '../../common/security/origin.guard.js';
+import { Public } from '../../common/security/route-protection.guard.js';
 import { CurrentCustomer, CustomerAuthGuard, type AuthenticatedCustomer } from '../customer-auth/customer-auth.guard.js';
 import { PaymentsService } from './payments.service.js';
 import type { WompiEvent } from './wompi.js';
@@ -51,6 +52,7 @@ export class PaymentsController {
   }
 
   /** Llamada de servidor a servidor: no trae Origin ni cookies; la protege el checksum. */
+  @Public()
   @Post('webhook')
   @HttpCode(200)
   @SkipOriginCheck()

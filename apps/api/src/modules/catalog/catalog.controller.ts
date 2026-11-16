@@ -4,11 +4,13 @@ import {
   productSlugSchema,
   type ProductListQuery,
 } from '@zapadictos/shared';
+import { Public } from '../../common/security/route-protection.guard.js';
 import { ZodValidationPipe } from '../../common/pipes/zod-validation.pipe.js';
 import { CatalogService } from './catalog.service.js';
 import { ProductsService } from './products.service.js';
 
 /** Endpoints públicos del catálogo (docs/04-api.md). */
+@Public()
 @Controller()
 export class CatalogController {
   constructor(
